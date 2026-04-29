@@ -189,7 +189,7 @@
     text-transform: uppercase;
   }
 
-  tbody td.person {
+  tbody td.labeler {
     font-family: 'Fraunces', serif;
     font-size: 18px;
     font-weight: 600;
@@ -269,7 +269,7 @@
   @media (max-width: 560px) {
     .wrap { padding: 32px 16px 48px; }
     tbody td { padding: 12px 10px; font-size: 14px; }
-    tbody td.person { font-size: 16px; }
+    tbody td.labeler { font-size: 16px; }
     tbody td:last-child { font-size: 10px; width: 80px; }
     thead th { padding: 6px 10px; }
   }
@@ -294,7 +294,7 @@
     <thead>
       <tr>
         <th>Absent</th>
-        <th>Person</th>
+        <th>labeler</th>
         <th>Reviews today</th>
         <th>Status</th>
       </tr>
@@ -329,9 +329,9 @@
 
   const absent = new Array(people.length).fill(false);
 
-  function findEffectiveCoverer(personIdx, absentSet) {
+  function findEffectiveCoverer(labelerIdx, absentSet) {
     const visited = new Set();
-    let current = personIdx;
+    let current = labelerIdx;
 
     while (true) {
       const coverer = coveredBy[current];
@@ -369,7 +369,7 @@
       tr.dataset.idx = i;
       tr.innerHTML = `
         <td><span class="toggle" aria-label="${absent[i] ? 'Absent' : 'Present'}"></span></td>
-        <td class="person">${people[i].name}</td>
+        <td class="labeler">${people[i].name}</td>
         <td class="reviews">${currentReviews[i]}</td>
         <td>${status[i]}</td>
       `;
