@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Review Cycle May 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+  :root {--bg:#f5f3ee; --ink:#1a1d22; --ink-soft:#5a5e66; --line:#d8d4c8; --green-bg:#d8ecd1; --green-ink:#1f5a2e; --green-line:#6fa57a; --amber-bg:#fbe7b3; --amber-ink:#7a4a05; --amber-line:#c89a3a; --red-bg:#f5c8c8; --red-ink:#7a1f1f; --red-line:#c46a6a; --accent:#1f4e79;}
+  * {box-sizing:border-box; margin:0; padding:0;}
+body {background:var(--bg); color:var(--ink); font-family:'Hanken Grotesk',sans-serif; font-size:16px; line-height:1.5; min-height:100vh;}
+.wrap {max-width:880px; margin:0 auto; padding:48px 24px 80px;}
+header {margin-bottom:32px; border-bottom:1px solid var(--line); padding-bottom:24px;}
+h1 {font-family:'Fraunces',serif; font-weight:400; font-size:44px; margin-bottom:10px;}
+table {width:100%; border-collapse:separate; border-spacing:0 6px; margin-top:8px;}
+th {padding:8px 16px; text-align:left; color:var(--ink-soft);}
+td {padding:16px; font-weight:500; border:1px solid;}
+tr.normal td {background:var(--green-bg); color:var(--green-ink); border-color:var(--green-line);}
+tr.covering td {background:var(--amber-bg); color:var(--amber-ink); border-color:var(--amber-line);}
+tr.absent td {background:var(--red-bg); color:var(--red-ink); border-color:var(--red-line);}
+button {background:transparent; border:1px solid var(--line); padding:6px 12px; cursor:pointer;}
+</style>
+  </head>
+  <body>
+  <div class="wrap">
+  <header>
+  <h1>Who reviews whom today?</h1>
+  <p>Click to mark absent. Coverage automatically reassigns.</p>
+<span id="today"></span>
+<button id="resetBtn">Reset</button>
+</header>
+<table>
+<thead><tr><th>Person</th><th>Reviews</th><th>Status</th></tr></thead>
+  <tbody id="tbody"></tbody>
+  </table>
+  <footer>Coverage: Sandra→Azul→Mati→Franco→Lautaro→Sandra. Azul also reviews Seann.</footer>
+</div>
+<script>
+const people = [{name:"Sandra",reviews:"Azul"},{name:"Azul",reviews:"Mati+Seann"},{name:"Mati",reviews:"Franco"},{name:"Franco",reviews:"Lautaro"},{name:"Lautaro",reviews:"Sandra"},{name:"Miguel",reviews:"no"},{name:"Seann",reviews:"no"}];
+const coveredBy = [4,0,1,2,3,-1,-1];
+const absent = new Array(people.length).fill(false);
+  function findEffectiveCoverer(i,s){const v=new Set();let c=i;while(true){const co=coveredBy[c];if(co<0)return -1;if(v.has(co))return -1;v.add(co);if(!s.has(co))return co;c=co;}}
+function render(){const r=people.map(p=>p.reviews);const st=new Array(people.length).fill("Normal");const s=new Set(absent.map((a,i)=>a?i:-1).filter(i=>i>=0));for(let i=0;i<people.length;i++){if(absent[i]){st[i]="Absent";r[i]="—absent—";const e=findEffectiveCoverer(i,s);if(e>=0){r[e]=r[e]+" + "+people[i].reviews;st[e]="Covering";}}}const tb=document.getElementById("tbody");tb.innerHTML="";for(let i=0;i<people.length;i++){const tr=document.createElement("tr");tr.className=st[i].toLowerCase();tr.innerHTML=`<td>${people[i].name}</td><td>${r[i]}</td><td>${st[i]}</td>`;tr.addEventListener("c
