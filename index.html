@@ -1,45 +1,429 @@
 <!DOCTYPE html>
-  <html lang="en">
-  <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Review Cycle May 2026</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-  :root {--bg:#f5f3ee; --ink:#1a1d22; --ink-soft:#5a5e66; --line:#d8d4c8; --green-bg:#d8ecd1; --green-ink:#1f5a2e; --green-line:#6fa57a; --amber-bg:#fbe7b3; --amber-ink:#7a4a05; --amber-line:#c89a3a; --red-bg:#f5c8c8; --red-ink:#7a1f1f; --red-line:#c46a6a; --accent:#1f4e79;}
-  * {box-sizing:border-box; margin:0; padding:0;}
-body {background:var(--bg); color:var(--ink); font-family:'Hanken Grotesk',sans-serif; font-size:16px; line-height:1.5; min-height:100vh;}
-.wrap {max-width:880px; margin:0 auto; padding:48px 24px 80px;}
-header {margin-bottom:32px; border-bottom:1px solid var(--line); padding-bottom:24px;}
-h1 {font-family:'Fraunces',serif; font-weight:400; font-size:44px; margin-bottom:10px;}
-table {width:100%; border-collapse:separate; border-spacing:0 6px; margin-top:8px;}
-th {padding:8px 16px; text-align:left; color:var(--ink-soft);}
-td {padding:16px; font-weight:500; border:1px solid;}
-tr.normal td {background:var(--green-bg); color:var(--green-ink); border-color:var(--green-line);}
-tr.covering td {background:var(--amber-bg); color:var(--amber-ink); border-color:var(--amber-line);}
-tr.absent td {background:var(--red-bg); color:var(--red-ink); border-color:var(--red-line);}
-button {background:transparent; border:1px solid var(--line); padding:6px 12px; cursor:pointer;}
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rotación de revisiones — Mayo 2026</title>
+<style>
+  :root {
+    --bg: #f5f3ee;
+    --card: #ffffff;
+    --text: #1a1d22;
+    --muted: #5a5e66;
+    --border: #d8d4c8;
+    --green: #1f5a2e;
+    --green-soft: #d8ecd1;
+    --amber: #7a4a05;
+    --amber-soft: #fbe7b3;
+    --red: #7a1f1f;
+    --red-soft: #f5c8c8;
+    --blue: #1f4e79;
+    --blue-soft: #e8f0ff;
+    --shadow: 0 1px 2px rgba(26,29,34,.08), 0 4px 12px rgba(26,29,34,.08);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    padding: 32px 16px;
+  }
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+  header {
+    margin-bottom: 24px;
+  }
+  h1 {
+    margin: 0 0 4px;
+    font-size: 24px;
+    font-weight: 600;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .card h2 {
+    margin: 0 0 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .absence-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+  }
+  .switch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: #fafbfc;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+    transition: background .15s, border-color .15s;
+  }
+  .switch:hover { background: #f4f5f7; }
+  .switch.is-absent {
+    background: var(--red-soft);
+    border-color: #d4a5a5;
+  }
+  .switch .name {
+    font-weight: 500;
+    font-size: 14px;
+  }
+  .switch input { display: none; }
+  .toggle {
+    width: 32px;
+    height: 18px;
+    background: #c1c7d0;
+    border-radius: 999px;
+    position: relative;
+    transition: background .15s;
+    flex-shrink: 0;
+  }
+  .toggle::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    background: white;
+    border-radius: 50%;
+    transition: transform .15s;
+    box-shadow: 0 1px 2px rgba(26,29,34,.2);
+  }
+  .switch.is-absent .toggle { background: var(--red); }
+  .switch.is-absent .toggle::after { transform: translateX(14px); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    font-weight: 600;
+    color: var(--muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    background: #fafbfc;
+  }
+  tr:last-child td { border-bottom: none; }
+  td.reviews { font-weight: 500; }
+  td.reviews .extra { color: var(--amber); font-weight: 500; }
+  tr.absent-row td { color: var(--muted); }
+  tr.absent-row td.person { text-decoration: line-through; }
+
+  .chip {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .chip-blue { background: var(--blue-soft); color: var(--blue); }
+  .chip-amber { background: var(--amber-soft); color: var(--amber); }
+  .chip-red { background: var(--red-soft); color: var(--red); }
+  .chip-green { background: var(--green-soft); color: var(--green); }
+  .chip-neutral { background: #f4f5f7; color: var(--muted); }
+
+  .banner {
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .banner.show { display: block; }
+  .banner-warning {
+    background: var(--amber-soft);
+    color: var(--amber);
+    border-left: 3px solid #c89a3a;
+  }
+  .banner strong { font-weight: 600; }
+
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .counter {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .counter strong { color: var(--text); }
+  button.reset {
+    background: white;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  button.reset:hover { background: #f4f5f7; }
+
+  .footer {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+  .footer code {
+    background: #f4f5f7;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 11.5px;
+  }
+  .cycle {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
 </style>
-  </head>
-  <body>
-  <div class="wrap">
+</head>
+<body>
+<div class="container">
   <header>
-  <h1>Who reviews whom today?</h1>
-  <p>Click to mark absent. Coverage automatically reassigns.</p>
-<span id="today"></span>
-<button id="resetBtn">Reset</button>
-</header>
-<table>
-<thead><tr><th>Person</th><th>Reviews</th><th>Status</th></tr></thead>
-  <tbody id="tbody"></tbody>
-  </table>
-  <footer>Coverage: Sandra→Azul→Mati→Franco→Lautaro→Sandra. Azul also reviews Seann.</footer>
+    <h1>Rotación de revisiones — Mayo 2026</h1>
+    <p class="subtitle">Marcá a quien no está y la tabla se actualiza sola. Regla: si alguien falta, quien lo iba a revisar <strong>salta al siguiente de la cadena</strong>.</p>
+  </header>
+
+  <div class="card">
+    <h2>Ausencias de hoy</h2>
+    <div class="absence-grid" id="absenceGrid"></div>
+  </div>
+
+  <div id="warningBanner" class="banner banner-warning"></div>
+
+  <div class="card">
+    <div class="toolbar">
+      <h2 style="margin:0;">Quién revisa a quién hoy</h2>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span class="counter" id="counter"></span>
+        <button class="reset" onclick="resetAbsences()">Reiniciar</button>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:30%;">Persona</th>
+          <th style="width:45%;">Revisa hoy</th>
+          <th style="width:25%;">Estado</th>
+        </tr>
+      </thead>
+      <tbody id="rotationTable"></tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    <p><strong>Cadena circular:</strong> <span class="cycle">Sandra → Azul → Mati → Franco → Lautaro → Sandra</span>. Azul revisa a Mati y Seann. Miguel y Seann no revisan a nadie.</p>
+    <p>Para el mes siguiente, guardá una copia del HTML y renombralo.</p>
+  </div>
 </div>
+
 <script>
-const people = [{name:"Sandra",reviews:"Azul"},{name:"Azul",reviews:"Mati+Seann"},{name:"Mati",reviews:"Franco"},{name:"Franco",reviews:"Lautaro"},{name:"Lautaro",reviews:"Sandra"},{name:"Miguel",reviews:"no"},{name:"Seann",reviews:"no"}];
-const coveredBy = [4,0,1,2,3,-1,-1];
-const absent = new Array(people.length).fill(false);
-  function findEffectiveCoverer(i,s){const v=new Set();let c=i;while(true){const co=coveredBy[c];if(co<0)return -1;if(v.has(co))return -1;v.add(co);if(!s.has(co))return co;c=co;}}
-function render(){const r=people.map(p=>p.reviews);const st=new Array(people.length).fill("Normal");const s=new Set(absent.map((a,i)=>a?i:-1).filter(i=>i>=0));for(let i=0;i<people.length;i++){if(absent[i]){st[i]="Absent";r[i]="—absent—";const e=findEffectiveCoverer(i,s);if(e>=0){r[e]=r[e]+" + "+people[i].reviews;st[e]="Covering";}}}const tb=document.getElementById("tbody");tb.innerHTML="";for(let i=0;i<people.length;i++){const tr=document.createElement("tr");tr.className=st[i].toLowerCase();tr.innerHTML=`<td>${people[i].name}</td><td>${r[i]}</td><td>${st[i]}</td>`;tr.addEventListener("c
+  const chain = ['Sandra', 'Azul', 'Mati', 'Franco', 'Lautaro'];
+  const allPeople = [...chain, 'Miguel', 'Seann'];
+  const azul = 'Azul';
+  const seann = 'Seann';
+  const miguel = 'Miguel';
+
+  const absent = new Set();
+
+  function nextPresentInChain(person) {
+    const n = chain.length;
+    const i = chain.indexOf(person);
+    if (i === -1) return null;
+    for (let k = 1; k <= n; k++) {
+      const cand = chain[(i + k) % n];
+      if (cand === person) break;
+      if (!absent.has(cand)) return cand;
+    }
+    return null;
+  }
+
+  function computeAssignments() {
+    const rows = [];
+    for (const p of chain) {
+      if (absent.has(p)) {
+        rows.push({ person: p, absent: true });
+        continue;
+      }
+      const target = nextPresentInChain(p);
+      const extra = (p === azul && !absent.has(seann)) ? seann : null;
+      rows.push({ person: p, absent: false, target, extra });
+    }
+    rows.push({ person: seann, absent: absent.has(seann), isBackup: true });
+    rows.push({ person: miguel, absent: absent.has(miguel), isBackup: true });
+    return rows;
+  }
+
+  function reviewersOf() {
+    const r = {};
+    for (const p of allPeople) r[p] = [];
+    for (const p of chain) {
+      if (absent.has(p)) continue;
+      const t = nextPresentInChain(p);
+      if (t) r[t].push(p);
+      if (p === azul && !absent.has(seann)) r[seann].push(azul);
+    }
+    return r;
+  }
+
+  function renderAbsenceToggles() {
+    const grid = document.getElementById('absenceGrid');
+    grid.innerHTML = '';
+    for (const p of allPeople) {
+      const label = document.createElement('label');
+      label.className = 'switch' + (absent.has(p) ? ' is-absent' : '');
+      label.innerHTML = `
+        <span class="name">${p}</span>
+        <span class="toggle"></span>
+        <input type="checkbox" ${absent.has(p) ? 'checked' : ''}>
+      `;
+      label.querySelector('input').addEventListener('change', (e) => {
+        if (e.target.checked) absent.add(p); else absent.delete(p);
+        render();
+      });
+      grid.appendChild(label);
+    }
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('rotationTable');
+    tbody.innerHTML = '';
+    const rows = computeAssignments();
+    const revs = reviewersOf();
+
+    for (const row of rows) {
+      const tr = document.createElement('tr');
+      if (row.absent) tr.classList.add('absent-row');
+
+      const personCell = `<td class="person">${row.person}</td>`;
+
+      let reviewsCell;
+      let statusCell;
+      const wasNormal = defaultTarget(row.person);
+      const skipped = !row.absent && !row.isBackup && row.target && row.target !== wasNormal;
+
+      if (row.absent) {
+        reviewsCell = `<td class="reviews">—</td>`;
+        statusCell = `<td><span class="chip chip-red">Ausente</span></td>`;
+      } else if (row.isBackup) {
+        const hisReviewer = revs[row.person];
+        if (hisReviewer.length > 0) {
+          reviewsCell = `<td class="reviews">— (no revisa)</td>`;
+          statusCell = `<td><span class="chip chip-neutral">Back-up</span></td>`;
+        } else {
+          reviewsCell = `<td class="reviews">— (no revisa)</td>`;
+          statusCell = `<td><span class="chip chip-neutral">Back-up</span> <span class="chip chip-red" title="Nadie lo revisa hoy">Sin revisor</span></td>`;
+        }
+      } else if (row.target === null) {
+        reviewsCell = `<td class="reviews">—</td>`;
+        statusCell = `<td><span class="chip chip-neutral">Sin revisión</span></td>`;
+      } else {
+        let targetHtml = `<strong>${row.target}</strong>`;
+        if (row.extra) targetHtml += ` + <span class="extra">${row.extra}</span>`;
+        if (skipped) targetHtml += ` <span class="chip chip-amber" style="margin-left:6px;">Reasignado</span>`;
+        reviewsCell = `<td class="reviews">${targetHtml}</td>`;
+        if (row.extra) {
+          statusCell = `<td><span class="chip chip-amber">En cadena + extra</span></td>`;
+        } else {
+          statusCell = `<td><span class="chip chip-green">En cadena</span></td>`;
+        }
+      }
+
+      tr.innerHTML = personCell + reviewsCell + statusCell;
+      tbody.appendChild(tr);
+    }
+  }
+
+  function defaultTarget(person) {
+    if (person === 'Sandra') return 'Azul';
+    if (person === 'Azul') return 'Mati';
+    if (person === 'Mati') return 'Franco';
+    if (person === 'Franco') return 'Lautaro';
+    if (person === 'Lautaro') return 'Sandra';
+    return null;
+  }
+
+  function renderCounter() {
+    const present = allPeople.length - absent.size;
+    document.getElementById('counter').innerHTML =
+      `<strong>${present}</strong> presentes · <strong>${absent.size}</strong> ausente${absent.size === 1 ? '' : 's'}`;
+  }
+
+  function renderWarning() {
+    const banner = document.getElementById('warningBanner');
+    const messages = [];
+    const revs = reviewersOf();
+
+    if (!absent.has(seann) && absent.has(azul)) {
+      messages.push(`<strong>Seann</strong> no tiene revisor hoy (Azul es la única que lo revisa).`);
+    }
+
+    for (const p of chain) {
+      if (absent.has(p)) continue;
+      const t = nextPresentInChain(p);
+      if (t === null) messages.push(`<strong>${p}</strong> no tiene a quién revisar — el resto de la cadena está ausente.`);
+    }
+
+    const chainAbsent = chain.filter(p => absent.has(p)).length;
+    if (chainAbsent >= 3 && !absent.has(seann)) {
+      messages.push(`Hay <strong>${chainAbsent} ausentes</strong> en la cadena — considerá a <strong>Seann</strong> como suplente para cubrir alguna revisión.`);
+    }
+
+    if (messages.length === 0) {
+      banner.classList.remove('show');
+      banner.innerHTML = '';
+    } else {
+      banner.classList.add('show');
+      banner.innerHTML = messages.map(m => `• ${m}`).join('<br>');
+    }
+  }
+
+  function render() {
+    renderAbsenceToggles();
+    renderTable();
+    renderCounter();
+    renderWarning();
+  }
+
+  function resetAbsences() {
+    absent.clear();
+    render();
+  }
+
+  render();
+</script>
+</body>
+</html>
