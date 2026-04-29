@@ -1,427 +1,395 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Rotación de revisiones — Mayo 2026</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Cycle — Who reviews whom today?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f5f3ee;
-    --card: #ffffff;
-    --text: #1a1d22;
-    --muted: #5a5e66;
-    --border: #d8d4c8;
-    --green: #1f5a2e;
-    --green-soft: #d8ecd1;
-    --amber: #7a4a05;
-    --amber-soft: #fbe7b3;
-    --red: #7a1f1f;
-    --red-soft: #f5c8c8;
-    --blue: #1f4e79;
-    --blue-soft: #e8f0ff;
-    --shadow: 0 1px 2px rgba(26,29,34,.08), 0 4px 12px rgba(26,29,34,.08);
+    --bg:           #f5f3ee;
+    --bg-grain:     #efece5;
+    --ink:          #1a1d22;
+    --ink-soft:     #5a5e66;
+    --line:         #d8d4c8;
+
+    --green-bg:     #d8ecd1;
+    --green-ink:    #1f5a2e;
+    --green-line:   #6fa57a;
+
+    --amber-bg:     #fbe7b3;
+    --amber-ink:    #7a4a05;
+    --amber-line:   #c89a3a;
+
+    --red-bg:       #f5c8c8;
+    --red-ink:      #7a1f1f;
+    --red-line:     #c46a6a;
+
+    --accent:       #1f4e79;
   }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
     background: var(--bg);
-    color: var(--text);
-    line-height: 1.5;
-    padding: 32px 16px;
-  }
-  .container {
-    max-width: 820px;
-    margin: 0 auto;
-  }
-  header {
-    margin-bottom: 24px;
-  }
-  h1 {
-    margin: 0 0 4px;
-    font-size: 24px;
-    font-weight: 600;
-  }
-  .subtitle {
-    color: var(--muted);
-    font-size: 14px;
-    margin: 0;
-  }
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 20px 24px;
-    margin-bottom: 16px;
-    box-shadow: var(--shadow);
-  }
-  .card h2 {
-    margin: 0 0 12px;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(31,78,121,0.04), transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(122,74,5,0.03), transparent 50%);
+    color: var(--ink);
+    font-family: 'Hanken Grotesk', -apple-system, sans-serif;
     font-size: 16px;
-    font-weight: 600;
-    color: var(--text);
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
   }
-  .absence-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  header {
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 24px;
+  }
+
+  .eyebrow {
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(32px, 5vw, 44px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+
+  h1 em {
+    font-style: italic;
+    font-variation-settings: 'opsz' 144;
+    color: var(--accent);
+  }
+
+  .sub {
+    color: var(--ink-soft);
+    font-size: 15px;
+    max-width: 560px;
+  }
+
+  .meta {
+    margin-top: 16px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  .meta .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: inline-block;
+  }
+
+  .actions {
+    margin-left: auto;
+    display: flex;
     gap: 8px;
   }
-  .switch {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 12px;
-    background: #fafbfc;
-    border: 1px solid var(--border);
+
+  button.reset {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 12px;
     border-radius: 6px;
     cursor: pointer;
-    user-select: none;
-    transition: background .15s, border-color .15s;
+    transition: all 0.15s ease;
   }
-  .switch:hover { background: #f4f5f7; }
-  .switch.is-absent {
-    background: var(--red-soft);
-    border-color: #d4a5a5;
+
+  button.reset:hover {
+    border-color: var(--ink);
+    color: var(--ink);
   }
-  .switch .name {
-    font-weight: 500;
-    font-size: 14px;
-  }
-  .switch input { display: none; }
-  .toggle {
-    width: 32px;
-    height: 18px;
-    background: #c1c7d0;
-    border-radius: 999px;
-    position: relative;
-    transition: background .15s;
-    flex-shrink: 0;
-  }
-  .toggle::after {
-    content: "";
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 14px;
-    height: 14px;
-    background: white;
-    border-radius: 50%;
-    transition: transform .15s;
-    box-shadow: 0 1px 2px rgba(26,29,34,.2);
-  }
-  .switch.is-absent .toggle { background: var(--red); }
-  .switch.is-absent .toggle::after { transform: translateX(14px); }
 
   table {
     width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
+    border-collapse: separate;
+    border-spacing: 0 6px;
+    margin-top: 8px;
   }
-  th, td {
-    text-align: left;
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--border);
-  }
-  th {
-    font-weight: 600;
-    color: var(--muted);
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    background: #fafbfc;
-  }
-  tr:last-child td { border-bottom: none; }
-  td.reviews { font-weight: 500; }
-  td.reviews .extra { color: var(--amber); font-weight: 500; }
-  tr.absent-row td { color: var(--muted); }
-  tr.absent-row td.person { text-decoration: line-through; }
 
-  .chip {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 3px;
+  thead th {
+    font-family: 'Hanken Grotesk', sans-serif;
     font-size: 11px;
-    font-weight: 600;
-    letter-spacing: .04em;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: left;
+    color: var(--ink-soft);
+    padding: 8px 16px;
+  }
+
+  thead th:first-child { width: 56px; text-align: center; }
+  thead th:last-child { width: 110px; text-align: center; }
+
+  tbody tr {
+    cursor: pointer;
+    transition: transform 0.12s ease;
+  }
+
+  tbody tr:hover { transform: translateX(2px); }
+
+  tbody td {
+    background: var(--green-bg);
+    color: var(--green-ink);
+    border-top: 1px solid var(--green-line);
+    border-bottom: 1px solid var(--green-line);
+    padding: 16px;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  tbody td:first-child {
+    border-left: 1px solid var(--green-line);
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    text-align: center;
+    width: 56px;
+  }
+
+  tbody td:last-child {
+    border-right: 1px solid var(--green-line);
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
-  .chip-blue { background: var(--blue-soft); color: var(--blue); }
-  .chip-amber { background: var(--amber-soft); color: var(--amber); }
-  .chip-red { background: var(--red-soft); color: var(--red); }
-  .chip-green { background: var(--green-soft); color: var(--green); }
-  .chip-neutral { background: #f4f5f7; color: var(--muted); }
 
-  .banner {
-    padding: 10px 14px;
-    border-radius: 6px;
-    font-size: 13px;
-    margin-bottom: 16px;
-    display: none;
+  tbody td.person {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
   }
-  .banner.show { display: block; }
-  .banner-warning {
-    background: var(--amber-soft);
-    color: var(--amber);
-    border-left: 3px solid #c89a3a;
-  }
-  .banner strong { font-weight: 600; }
 
-  .toolbar {
-    display: flex;
-    justify-content: space-between;
+  tbody tr.covering td {
+    background: var(--amber-bg);
+    color: var(--amber-ink);
+    border-color: var(--amber-line);
+  }
+
+  tbody tr.absent td {
+    background: var(--red-bg);
+    color: var(--red-ink);
+    border-color: var(--red-line);
+  }
+
+  tbody tr.absent td.reviews {
+    font-style: italic;
+    opacity: 0.85;
+  }
+
+  .toggle {
+    display: inline-flex;
     align-items: center;
-    margin-bottom: 12px;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    border: 1.5px solid currentColor;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  tr.absent .toggle::before { content: "✕"; }
+  tr:not(.absent) .toggle::before { content: ""; }
+
+  .legend {
+    display: flex;
+    gap: 20px;
     flex-wrap: wrap;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px dashed var(--line);
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
     gap: 8px;
   }
-  .counter {
-    font-size: 13px;
-    color: var(--muted);
-  }
-  .counter strong { color: var(--text); }
-  button.reset {
-    background: white;
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 13px;
-    cursor: pointer;
-    font-weight: 500;
-  }
-  button.reset:hover { background: #f4f5f7; }
 
-  .footer {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 16px;
+  .swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    border: 1px solid;
+  }
+
+  .swatch.green  { background: var(--green-bg); border-color: var(--green-line); }
+  .swatch.amber  { background: var(--amber-bg); border-color: var(--amber-line); }
+  .swatch.red    { background: var(--red-bg);   border-color: var(--red-line);   }
+
+  footer.note {
+    margin-top: 36px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-style: italic;
     line-height: 1.6;
   }
-  .footer code {
-    background: #f4f5f7;
-    padding: 1px 6px;
-    border-radius: 3px;
-    font-size: 11.5px;
-  }
-  .cycle {
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 12.5px;
-    color: var(--muted);
+
+  @media (max-width: 560px) {
+    .wrap { padding: 32px 16px 48px; }
+    tbody td { padding: 12px 10px; font-size: 14px; }
+    tbody td.person { font-size: 16px; }
+    tbody td:last-child { font-size: 10px; width: 80px; }
+    thead th { padding: 6px 10px; }
   }
 </style>
 </head>
 <body>
-<div class="container">
+<div class="wrap">
+
   <header>
-    <h1>Rotación de revisiones — Mayo 2026</h1>
-    <p class="subtitle">Marcá a quien no está y la tabla se actualiza sola. Regla: si alguien falta, quien lo iba a revisar <strong>salta al siguiente de la cadena</strong>.</p>
-  </header>
-
-  <div class="card">
-    <h2>Ausencias de hoy</h2>
-    <div class="absence-grid" id="absenceGrid"></div>
-  </div>
-
-  <div id="warningBanner" class="banner banner-warning"></div>
-
-  <div class="card">
-    <div class="toolbar">
-      <h2 style="margin:0;">Quién revisa a quién hoy</h2>
-      <div style="display:flex; align-items:center; gap:12px;">
-        <span class="counter" id="counter"></span>
-        <button class="reset" onclick="resetAbsences()">Reiniciar</button>
+    <div class="eyebrow">Review cycle — May 2026</div>
+    <h1>Who reviews <em>whom</em> today?</h1>
+    <p class="sub">Click on a row to mark someone absent. The table will reassign their reviews to whoever is covering for them.</p>
+    <div class="meta">
+      <span><span class="dot"></span> <span id="today"></span></span>
+      <div class="actions">
+        <button class="reset" id="resetBtn">Reset all</button>
       </div>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th style="width:30%;">Persona</th>
-          <th style="width:45%;">Revisa hoy</th>
-          <th style="width:25%;">Estado</th>
-        </tr>
-      </thead>
-      <tbody id="rotationTable"></tbody>
-    </table>
+  </header>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Absent</th>
+        <th>Person</th>
+        <th>Reviews today</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+  <div class="legend">
+    <div class="legend-item"><span class="swatch green"></span> Normal</div>
+    <div class="legend-item"><span class="swatch amber"></span> Covering for someone</div>
+    <div class="legend-item"><span class="swatch red"></span> Absent</div>
   </div>
 
-  <div class="footer">
-    <p><strong>Cadena circular:</strong> <span class="cycle">Sandra → Azul → Mati → Franco → Lautaro → Sandra</span>. Azul revisa a Mati y Seann. Miguel y Seann no revisan a nadie.</p>
-    <p>Para el mes siguiente, guardá una copia del HTML y renombralo.</p>
-  </div>
+  <footer class="note">
+    Coverage rules: Sandra → Azul → Mati → Franco → Lautaro → Sandra (circular). Azul also reviews Seann. Miguel and Seann have no fixed coverers.
+  </footer>
+
 </div>
 
 <script>
-  const chain = ['Sandra', 'Azul', 'Mati', 'Franco', 'Lautaro'];
-  const allPeople = [...chain, 'Miguel', 'Seann'];
-  const azul = 'Azul';
-  const seann = 'Seann';
-  const miguel = 'Miguel';
+  const people = [
+    { name: "Sandra",  reviews: "Azul" },
+    { name: "Azul",    reviews: "Mati + Seann" },
+    { name: "Mati",    reviews: "Franco" },
+    { name: "Franco",  reviews: "Lautaro" },
+    { name: "Lautaro", reviews: "Sandra" },
+    { name: "Miguel",  reviews: "no reviews" },
+    { name: "Seann",   reviews: "no reviews" },
+  ];
 
-  const absent = new Set();
+  const coveredBy = [4, 0, 1, 2, 3, -1, -1];
 
-  function nextPresentInChain(person) {
-    const n = chain.length;
-    const i = chain.indexOf(person);
-    if (i === -1) return null;
-    for (let k = 1; k <= n; k++) {
-      const cand = chain[(i + k) % n];
-      if (cand === person) break;
-      if (!absent.has(cand)) return cand;
-    }
-    return null;
-  }
+  const absent = new Array(people.length).fill(false);
 
-  function computeAssignments() {
-    const rows = [];
-    for (const p of chain) {
-      if (absent.has(p)) {
-        rows.push({ person: p, absent: true });
-        continue;
-      }
-      const target = nextPresentInChain(p);
-      const extra = (p === azul && !absent.has(seann)) ? seann : null;
-      rows.push({ person: p, absent: false, target, extra });
-    }
-    rows.push({ person: seann, absent: absent.has(seann), isBackup: true });
-    rows.push({ person: miguel, absent: absent.has(miguel), isBackup: true });
-    return rows;
-  }
+  function findEffectiveCoverer(personIdx, absentSet) {
+    const visited = new Set();
+    let current = personIdx;
 
-  function reviewersOf() {
-    const r = {};
-    for (const p of allPeople) r[p] = [];
-    for (const p of chain) {
-      if (absent.has(p)) continue;
-      const t = nextPresentInChain(p);
-      if (t) r[t].push(p);
-      if (p === azul && !absent.has(seann)) r[seann].push(azul);
-    }
-    return r;
-  }
-
-  function renderAbsenceToggles() {
-    const grid = document.getElementById('absenceGrid');
-    grid.innerHTML = '';
-    for (const p of allPeople) {
-      const label = document.createElement('label');
-      label.className = 'switch' + (absent.has(p) ? ' is-absent' : '');
-      label.innerHTML = `
-        <span class="name">${p}</span>
-        <span class="toggle"></span>
-        <input type="checkbox" ${absent.has(p) ? 'checked' : ''}>
-      `;
-      label.querySelector('input').addEventListener('change', (e) => {
-        if (e.target.checked) absent.add(p); else absent.delete(p);
-        render();
-      });
-      grid.appendChild(label);
-    }
-  }
-
-  function renderTable() {
-    const tbody = document.getElementById('rotationTable');
-    tbody.innerHTML = '';
-    const rows = computeAssignments();
-    const revs = reviewersOf();
-
-    for (const row of rows) {
-      const tr = document.createElement('tr');
-      if (row.absent) tr.classList.add('absent-row');
-
-      const personCell = `<td class="person">${row.person}</td>`;
-
-      let reviewsCell;
-      let statusCell;
-      const wasNormal = defaultTarget(row.person);
-      const skipped = !row.absent && !row.isBackup && row.target && row.target !== wasNormal;
-
-      if (row.absent) {
-        reviewsCell = `<td class="reviews">—</td>`;
-        statusCell = `<td><span class="chip chip-red">Ausente</span></td>`;
-      } else if (row.isBackup) {
-        const hisReviewer = revs[row.person];
-        if (hisReviewer.length > 0) {
-          reviewsCell = `<td class="reviews">— (no revisa)</td>`;
-          statusCell = `<td><span class="chip chip-neutral">Back-up</span></td>`;
-        } else {
-          reviewsCell = `<td class="reviews">— (no revisa)</td>`;
-          statusCell = `<td><span class="chip chip-neutral">Back-up</span> <span class="chip chip-red" title="Nadie lo revisa hoy">Sin revisor</span></td>`;
-        }
-      } else if (row.target === null) {
-        reviewsCell = `<td class="reviews">—</td>`;
-        statusCell = `<td><span class="chip chip-neutral">Sin revisión</span></td>`;
-      } else {
-        let targetHtml = `<strong>${row.target}</strong>`;
-        if (row.extra) targetHtml += ` + <span class="extra">${row.extra}</span>`;
-        if (skipped) targetHtml += ` <span class="chip chip-amber" style="margin-left:6px;">Reasignado</span>`;
-        reviewsCell = `<td class="reviews">${targetHtml}</td>`;
-        if (row.extra) {
-          statusCell = `<td><span class="chip chip-amber">En cadena + extra</span></td>`;
-        } else {
-          statusCell = `<td><span class="chip chip-green">En cadena</span></td>`;
-        }
-      }
-
-      tr.innerHTML = personCell + reviewsCell + statusCell;
-      tbody.appendChild(tr);
-    }
-  }
-
-  function defaultTarget(person) {
-    if (person === 'Sandra') return 'Azul';
-    if (person === 'Azul') return 'Mati';
-    if (person === 'Mati') return 'Franco';
-    if (person === 'Franco') return 'Lautaro';
-    if (person === 'Lautaro') return 'Sandra';
-    return null;
-  }
-
-  function renderCounter() {
-    const present = allPeople.length - absent.size;
-    document.getElementById('counter').innerHTML =
-      `<strong>${present}</strong> presentes · <strong>${absent.size}</strong> ausente${absent.size === 1 ? '' : 's'}`;
-  }
-
-  function renderWarning() {
-    const banner = document.getElementById('warningBanner');
-    const messages = [];
-    const revs = reviewersOf();
-
-    if (!absent.has(seann) && absent.has(azul)) {
-      messages.push(`<strong>Seann</strong> no tiene revisor hoy (Azul es la única que lo revisa).`);
-    }
-
-    for (const p of chain) {
-      if (absent.has(p)) continue;
-      const t = nextPresentInChain(p);
-      if (t === null) messages.push(`<strong>${p}</strong> no tiene a quién revisar — el resto de la cadena está ausente.`);
-    }
-
-    const chainAbsent = chain.filter(p => absent.has(p)).length;
-    if (chainAbsent >= 3 && !absent.has(seann)) {
-      messages.push(`Hay <strong>${chainAbsent} ausentes</strong> en la cadena — considerá a <strong>Seann</strong> como suplente para cubrir alguna revisión.`);
-    }
-
-    if (messages.length === 0) {
-      banner.classList.remove('show');
-      banner.innerHTML = '';
-    } else {
-      banner.classList.add('show');
-      banner.innerHTML = messages.map(m => `• ${m}`).join('<br>');
+    while (true) {
+      const coverer = coveredBy[current];
+      if (coverer < 0) return -1;
+      if (visited.has(coverer)) return -1;
+      visited.add(coverer);
+      if (!absentSet.has(coverer)) return coverer;
+      current = coverer;
     }
   }
 
   function render() {
-    renderAbsenceToggles();
-    renderTable();
-    renderCounter();
-    renderWarning();
+    const currentReviews = people.map(p => p.reviews);
+    const status = new Array(people.length).fill("Normal");
+    const absentSet = new Set(absent.map((a, i) => a ? i : -1).filter(i => i >= 0));
+
+    for (let i = 0; i < people.length; i++) {
+      if (absent[i]) {
+        status[i] = "Absent";
+        currentReviews[i] = "— absent —";
+
+        const effectiveCoverer = findEffectiveCoverer(i, absentSet);
+        if (effectiveCoverer >= 0) {
+          currentReviews[effectiveCoverer] = currentReviews[effectiveCoverer] + " + " + people[i].reviews;
+          status[effectiveCoverer] = "Covering";
+        }
+      }
+    }
+
+    const tbody = document.getElementById("tbody");
+    tbody.innerHTML = "";
+    for (let i = 0; i < people.length; i++) {
+      const tr = document.createElement("tr");
+      tr.className = status[i].toLowerCase();
+      tr.dataset.idx = i;
+      tr.innerHTML = `
+        <td><span class="toggle" aria-label="${absent[i] ? 'Absent' : 'Present'}"></span></td>
+        <td class="person">${people[i].name}</td>
+        <td class="reviews">${currentReviews[i]}</td>
+        <td>${status[i]}</td>
+      `;
+      tr.addEventListener("click", () => {
+        absent[i] = !absent[i];
+        render();
+      });
+      tbody.appendChild(tr);
+    }
   }
 
-  function resetAbsences() {
-    absent.clear();
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    for (let i = 0; i < absent.length; i++) absent[i] = false;
     render();
-  }
+  });
+
+  const today = new Date();
+  document.getElementById("today").textContent = today.toLocaleDateString("en-US", {
+    weekday: "long", year: "numeric", month: "long", day: "numeric"
+  });
 
   render();
 </script>
